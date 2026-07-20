@@ -20,12 +20,9 @@ Search the codebase for `TBD` to find every instance. They are:
 
 | Placeholder | Where it appears | What to do |
 |---|---|---|
-| `[ADDRESS TBD]` | JSON-LD `streetAddress` on every page, `about.html`, `contact.html` | Replace with the real Pine Bluff shop street address (and add `postalCode` to the JSON-LD once known). |
-| `[HOURS TBD]` | JSON-LD `openingHours` on every page, `contact.html` | Replace with real business hours (e.g. `Mo-Fr 09:00-18:00, Sa 10:00-14:00` for schema.org format, and a human-readable version in `contact.html`). |
 | `YOUR_FORM_ID` | Booking form `action` in `index.html` and `contact.html` | Create a form at [Formspree](https://formspree.io) and replace `https://formspree.io/f/YOUR_FORM_ID` with your real endpoint. |
-| Google Maps embed | `contact.html` (HTML comment marks the spot) | Once the shop address is finalized, replace the `.map-embed-placeholder` div with a Google Maps `<iframe>` embed. |
-| `YOUR_GOOGLE_REVIEW_ID` | Google review link in `contact.html` | Replace with your Google Business Profile's short review link (Google Business Profile → "Ask for reviews" → copy link). |
-| Social links | Footer/contact on every page | Facebook, Instagram, and TikTok links currently point to `https://facebook.com/ClarksElectronicSolutions`, `https://instagram.com/ClarksElectronicSolutions`, `https://tiktok.com/@ClarksElectronicSolutions` — update if the real handles differ. |
+
+Resolved and no longer placeholders: street address (503 W 29th Ave, Pine Bluff, AR 71603 — set in every page's JSON-LD plus About/Contact body copy), business hours (set in every page's JSON-LD `openingHours` plus Contact page), and the Google Maps embed on `contact.html` (live iframe, not a placeholder). Social media footer links and the "leave a Google review" link were removed from the site entirely per request — there is currently no outbound link to the business's Facebook/Instagram/TikTok/Google review page anywhere on the site. If you want those back, they'll need to be re-added along with real (not placeholder) URLs.
 
 ## Logo Note
 
@@ -45,7 +42,7 @@ If you regenerate or replace the logo in the future, re-crop it the same way and
 /phone-repair.html
 /services/{computer,tablet,game-console,business}-repair-or-services.html
 /areas/{pine-bluff,white-hall,stuttgart,el-dorado}-ar.html
-/about.html /contact.html /privacy.html /terms.html
+/contact.html /privacy.html /terms.html
 /styles.css /main.js
 /assets/img/clarks-emblem.jpg
 /sitemap.xml /robots.txt
