@@ -146,6 +146,24 @@ section.alt-bg { background: var(--panel); }
   background: rgba(17,18,20,0.92);
   backdrop-filter: saturate(140%) blur(10px);
   border-bottom: 1px solid var(--border);
+  transition: background .3s ease, border-color .3s ease, box-shadow .3s ease;
+}
+.site-header.is-scrolled { box-shadow: 0 6px 20px rgba(0,0,0,0.35); }
+
+/* Home page: header floats transparently over the hero art until scrolled,
+   instead of sitting in a solid bar. Fixed (not sticky) so it never
+   reserves flow space and the hero can bleed all the way to the top. */
+.page-home .site-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  background: transparent;
+  backdrop-filter: none;
+  border-bottom-color: transparent;
+}
+.page-home .site-header.is-scrolled {
+  background: rgba(17,18,20,0.92);
+  backdrop-filter: saturate(140%) blur(10px);
+  border-bottom-color: var(--border);
 }
 
 .header-inner {
@@ -243,6 +261,7 @@ section.alt-bg { background: var(--panel); }
   display: none;
   align-items: center;
   gap: 6px;
+  margin-right: 22px;
   font-family: var(--font-display);
   font-weight: 600;
   color: var(--silver);
@@ -369,35 +388,50 @@ section.alt-bg { background: var(--panel); }
 /* ---- Hero ---- */
 .hero {
   position: relative;
-  padding: 56px 0 64px;
+  padding: 0 0 56px;
   background:
     radial-gradient(circle at 80% -10%, rgba(201,162,75,0.10), transparent 55%),
     radial-gradient(circle at 0% 100%, rgba(201,162,75,0.06), transparent 45%);
   border-bottom: 1px solid var(--border);
+  overflow: hidden;
 }
-.hero-grid {
-  display: grid;
-  gap: 40px;
-  align-items: center;
+
+/* Scrim so the floating transparent header stays legible over the hero art
+   underneath it, without needing a solid header background. */
+.hero::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 220px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
+  pointer-events: none;
+  z-index: 1;
 }
+
+/* Full-bleed: sits outside .container so it spans the entire hero width
+   (edge-to-edge on mobile) regardless of the page's max-width container. */
 .hero-emblem-wrap {
+  position: relative;
+  width: 100%;
   display: flex;
   justify-content: center;
+  padding-top: 20px;
 }
 .hero-emblem {
-  width: 200px;
-  height: 200px;
+  width: clamp(240px, 74vw, 336px);
+  height: clamp(240px, 74vw, 336px);
   object-fit: cover;
   object-position: center 30%;
-  -webkit-mask-image: radial-gradient(circle at 50% 45%, #000 58%, transparent 80%);
-  mask-image: radial-gradient(circle at 50% 45%, #000 58%, transparent 80%);
+  -webkit-mask-image: radial-gradient(circle at 50% 45%, #000 60%, transparent 82%);
+  mask-image: radial-gradient(circle at 50% 45%, #000 60%, transparent 82%);
 }
-.hero-wordmark { text-align: center; margin-top: -8px; }
-.hero-wordmark .brand-name { font-size: 2.1rem; }
-.hero-wordmark .brand-sub { font-size: 0.72rem; }
-.hero h1 { margin: 20px 0 16px; text-align: center; }
+
+.hero-grid { position: relative; z-index: 2; }
+.hero-content { text-align: center; }
+.hero h1 { margin: 0 0 16px; text-align: center; }
 .hero .lede { text-align: center; max-width: 640px; margin: 0 auto 28px; }
 .hero .btn-row { justify-content: center; }
+.hero .hero-badge { margin: 0 auto 24px; }
 
 .trust-strip {
   margin-top: 40px;
@@ -421,12 +455,48 @@ section.alt-bg { background: var(--panel); }
 @media (min-width: 700px) {
   .trust-strip { grid-template-columns: repeat(3, auto); justify-content: center; }
   .trust-strip li { background: transparent; border: none; padding: 0; }
+  .hero-emblem { width: clamp(304px, 48vw, 416px); height: clamp(304px, 48vw, 416px); }
 }
 
-@media (min-width: 900px) {
-  .hero-grid { grid-template-columns: 260px 1fr; text-align: left; }
-  .hero-wordmark, .hero h1, .hero .lede { text-align: left; margin-left: 0; margin-right: 0; }
+/* Desktop: switch from stacked/centered to a split layout — copy top-aligned
+   on the left, the ram emblem on the right sized down with breathing room
+   on every side so it no longer overtakes the whole hero. */
+@media (min-width: 1000px) {
+  .hero {
+    min-height: 600px;
+    display: flex;
+    align-items: stretch;
+    padding-bottom: 0;
+  }
+  .hero-emblem-wrap {
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    /* width must be reset to auto — the base (mobile) rule sets
+       width:100%, and leaving that in place over-constrains the box
+       (left + width + right all set), which makes the browser ignore
+       right:0 and overflow the image off the edge of the viewport. */
+    width: auto;
+    /* Positions the image's left edge exactly (copy's right edge + 56px),
+       tracking the centered .container at any viewport width, so the gap
+       to the copy on the left equals the 56px padding to the border on
+       the right — not just an approximation at one screen size. */
+    left: calc(max(0px, (100vw - 1200px) / 2) + 500px);
+    padding: 130px 56px 64px 56px;
+    box-sizing: border-box;
+  }
+  .hero-emblem {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    border-radius: var(--radius-lg);
+    object-position: center 24%;
+  }
+  .hero-grid { width: 100%; padding: 130px 0 80px; }
+  .hero-content { text-align: left; max-width: 480px; }
+  .hero h1, .hero .lede { text-align: left; margin-left: 0; margin-right: 0; }
   .hero .btn-row { justify-content: flex-start; }
+  .hero .hero-badge { margin: 0 0 24px; }
+  .hero .trust-strip { justify-content: flex-start; }
 }
 
 /* ---- Page Header (non-home pages) ---- */
@@ -678,6 +748,107 @@ table.price-table td.price { color: var(--gold); font-family: var(--font-display
 .form-field textarea { resize: vertical; min-height: 110px; }
 .form-note { font-size: 0.82rem; color: var(--text-muted); margin-top: 4px; }
 
+/* ---- Customer Reviews (auto-scrolling marquee) ---- */
+.reviews-section {
+  padding: 64px 0;
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+@media (min-width: 700px) { .reviews-section { padding: 88px 0; } }
+
+/* Google rating pill badge — reused in the hero and the reviews section */
+.google-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 22px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 999px;
+}
+.google-badge .stars { display: inline-flex; gap: 2px; }
+.google-badge .star { width: 17px; height: 17px; fill: var(--gold); }
+.google-badge .reviews-score {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--white);
+  font-size: 1.1rem;
+}
+.google-badge .badge-divider { width: 1px; height: 20px; background: rgba(255,255,255,0.2); }
+.google-badge .reviews-count { color: var(--text-muted); font-size: 0.9rem; white-space: nowrap; }
+
+.reviews-rating { display: flex; justify-content: center; margin-top: 18px; }
+
+/* Carousel: prev/next arrows plus a native horizontal-scroll row, advanced
+   by JS in discrete one-card jumps via scrollTo (see main.js). Deliberately
+   avoids CSS mask-image, keyframe/transform animation, and a continuous
+   per-frame scrollLeft loop — all three were tested and failed to render
+   the row correctly in Safari (a continuous JS-driven scrollLeft change is
+   a known WebKit repaint bug). Native overflow-x guarantees the cards are
+   always visible and swipeable even if JS never runs. */
+.reviews-carousel {
+  margin-top: 44px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.reviews-nav {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--panel-raised);
+  border: 1px solid var(--border);
+  color: var(--silver);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color .2s ease, color .2s ease;
+}
+.reviews-nav:hover { border-color: var(--gold); color: var(--gold); }
+.reviews-nav svg { width: 20px; height: 20px; }
+
+.reviews-marquee {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+.reviews-marquee::-webkit-scrollbar { display: none; }
+
+.reviews-track {
+  display: flex;
+  gap: 20px;
+  width: max-content;
+}
+
+.review-card {
+  flex: 0 0 340px;
+  background: var(--panel-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.review-card .stars { display: inline-flex; gap: 2px; }
+.review-card .star { width: 15px; height: 15px; fill: var(--gold); }
+.review-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin: 0; }
+.review-card .review-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--silver);
+  font-size: 0.88rem;
+  margin-top: auto;
+}
+
 /* ---- Contact strip ---- */
 .contact-cta {
   text-align: center;
@@ -755,6 +926,20 @@ table.price-table td.price { color: var(--gold); font-family: var(--font-display
 .center { text-align: center; }
 .max-w-content { max-width: 760px; }
 .max-w-content.center { margin-left: auto; margin-right: auto; }
+
+/* Service-area intro paragraphs (and similar single-column body copy):
+   plain, never bold, all one consistent size and (lighter/muted) color —
+   overrides .lede's larger size/muted color on the first paragraph only
+   applying to itself, so every paragraph here matches instead of the
+   first one reading bigger and the rest reading smaller. Real breathing
+   room between them too (the global reset zeroes out <p> margins). */
+.container.max-w-content > p {
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+.container.max-w-content > p:last-child { margin-bottom: 0; }
 .stack { display: flex; flex-direction: column; gap: 16px; }
 .sr-only {
   position: absolute;
@@ -780,14 +965,13 @@ table.price-table td.price { color: var(--gold); font-family: var(--font-display
   padding: 7px 16px;
 }
 
-.map-embed-placeholder {
-  background: var(--panel);
-  border: 1px dashed var(--border);
+.map-embed {
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 60px 20px;
-  text-align: center;
-  color: var(--text-muted);
+  overflow: hidden;
+  line-height: 0;
 }
+.map-embed iframe { display: block; }
 
 blockquote.legal, .legal-body {
   color: var(--text-muted);
