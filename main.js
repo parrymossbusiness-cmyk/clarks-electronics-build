@@ -121,18 +121,14 @@
       reviewsMarquee.scrollTo({ left: reviewsCards[reviewsIndex].offsetLeft, behavior: "smooth" });
     }
 
+    /* Navigation is manual only — prev/next buttons (or swipe). No
+       auto-advance timer: it was jumping the row on its own before the
+       user ever touched it, especially right as the section scrolled
+       into view on mobile. */
     var prevBtn = document.querySelector(".reviews-nav-prev");
     var nextBtn = document.querySelector(".reviews-nav-next");
     if (prevBtn) prevBtn.addEventListener("click", function () { goToReview(reviewsIndex - 1); });
     if (nextBtn) nextBtn.addEventListener("click", function () { goToReview(reviewsIndex + 1); });
-
-    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      var reviewsTimer = setInterval(function () { goToReview(reviewsIndex + 1); }, 5000);
-      reviewsMarquee.addEventListener("mouseenter", function () { clearInterval(reviewsTimer); });
-      reviewsMarquee.addEventListener("mouseleave", function () {
-        reviewsTimer = setInterval(function () { goToReview(reviewsIndex + 1); }, 5000);
-      });
-    }
   }
 
   /* Hero emblem placement (desktop only): position the image's left edge

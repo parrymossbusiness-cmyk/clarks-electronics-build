@@ -415,7 +415,10 @@ section.alt-bg { background: var(--panel); }
   width: 100%;
   display: flex;
   justify-content: center;
-  padding-top: 20px;
+  /* Clears the floating fixed header (--header-h) plus breathing room, so
+     the ram's top edge starts cleanly below it instead of poking up behind
+     the header and crowding the "Clark's Electronic Solutions" wordmark. */
+  padding-top: calc(var(--header-h) + 24px);
 }
 .hero-emblem {
   width: clamp(240px, 74vw, 336px);
@@ -829,7 +832,11 @@ table.price-table td.price { color: var(--gold); font-family: var(--font-display
 }
 
 .review-card {
-  flex: 0 0 340px;
+  /* Shrinks to fit whatever width the marquee actually has left after the
+     container padding + two 44px nav buttons + gaps, capped at 340px, so
+     one card fits fully in view on narrow phones instead of always being
+     340px wide and getting clipped by the visible area. */
+  flex: 0 0 min(340px, calc(100vw - 152px));
   background: var(--panel-raised);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
